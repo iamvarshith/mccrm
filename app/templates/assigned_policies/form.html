@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}{% if assigned_policy %}Edit{% else %}New{% endif %} Policy Assignment{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                {% if assigned_policy %}Edit{% else %}New{% endif %} Policy Assignment
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                {% if assigned_policy %}Update assignment details{% else %}Assign a policy to a client{% endif %}
+            </p>
+        </div>
+        <div class="border-t border-gray-200">
+            <form method="POST" class="space-y-6 p-6">
+                {% if not assigned_policy %}
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <!-- Client Selection -->
+                    <div class="sm:col-span-6">
+                        <label for="client_id" class="block text-sm font-medium text-gray-700">Client</label>
+                        <div class="mt-1">
+                            <select id="client_id" name="client_id" required
+                                    class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                <option value="">Select client...</option>
+                                {% for client in clients %}
+                                <option value="{{ client.id }}" {% if request.args.get('client_id')|int == client.id %}selected{% endif %}>
+                                    {{ client.name }} ({{ client.phone }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Policy Type Selection -->
+                    <div class="sm:col-span-3">
+                        <label for="policy_type" class="block text-sm font-medium text-gray-700">Policy Type</label>
+                        <div class="mt-1">
+                            <select id="policy_type" name="policy_type" required
+                                    class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                <option value="">Select type...</option>
+                                <option value="global">Global Policy</option>
+                                <option value="user">Custom Policy</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Policy Selection -->
+                    <div class="sm:col-span-3">
+                        <label for="policy_id" class="block text-sm font-medium text-gray-700">Policy</label>
+                        <div class="mt-1">
+                            <select id="policy_id" name="policy_id" required
+                                    class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                <option value="">Select policy...</option>
+                                <optgroup label="Global Policies">
+                                    {% for policy in global_policies %}
+                                    <option value="{{ policy.id }}" data-type="global">{{ policy.name }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                <optgroup label="Custom Policies">
+                                    {% for policy in user_policies %}
+                                    <option value="{{ policy.id }}" data-type="user">{{ policy.name }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <!-- Start Date -->
+                    <div class="sm:col-span-3">
+                        <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
+                        <div class="mt-1">
+                            <input type="date" name="start_date" id="start_date" 
+                                   value="{{ assigned_policy.start_date.strftime('%Y-%m-%d') if assigned_policy else '' }}"
+                                   required
+                                   class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="sm:col-span-3">
+                        <label for="duration_months" class="block text-sm font-medium text-gray-700">Duration (months)</label>
+                        <div class="mt-1">
+                            <input type="number" name="duration_months" id="duration_months" 
+                                   value="{{ assigned_policy.duration_months if assigned_policy else '' }}"
+                                   min="1" max="120" required
+                                   class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <!-- Premium Amount -->
+                    <div class="sm:col-span-3">
+                        <label for="premium_amount" class="block text-sm font-medium text-gray-700">Premium Amount ($)</label>
+                        <div class="mt-1">
+                            <input type="number" name="premium_amount" id="premium_amount" 
+                                   value="{{ assigned_policy.premium_amount if assigned_policy else '' }}"
+                                   min="0" step="0.01" required
+                                   class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <!-- Payment Cycle -->
+                    <div class="sm:col-span-3">
+                        <label for="payment_cycle_months" class="block text-sm font-medium text-gray-700">Payment Cycle (months)</label>
+                        <div class="mt-1">
+                            <input type="number" name="payment_cycle_months" id="payment_cycle_months" 
+                                   value="{{ assigned_policy.payment_cycle_months if assigned_policy else '' }}"
+                                   min="1" max="12" required
+                                   class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    {% if assigned_policy %}
+                    <!-- Status -->
+                    <div class="sm:col-span-3">
+                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <div class="mt-1">
+                            <select id="status" name="status" required
+                                    class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                <option value="active" {% if assigned_policy.status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="pending" {% if assigned_policy.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="cancelled" {% if assigned_policy.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <a href="{{ url_for('assigned_policy_bp.list') }}"
+                       class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        {% if assigned_policy %}Update{% else %}Create{% endif %} Assignment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.getElementById('policy_type')?.addEventListener('change', function() {
+    const policySelect = document.getElementById('policy_id');
+    const options = policySelect.options;
+    
+    for (let i = 0; i < options.length; i++) {
+        const option = options[i];
+        if (option.dataset.type) {
+            option.style.display = option.dataset.type === this.value ? '' : 'none';
+        }
+    }
+    
+    policySelect.value = '';
+});
+</script>
+{% endblock %}
+{% endblock %} 

@@ -1,0 +1,117 @@
+{% extends "base_tailwind.html" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance CRM - {% block title %}{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    {% if current_user.is_authenticated %}
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <nav class="bg-gray-800 w-64 flex-shrink-0">
+            <div class="h-16 flex items-center px-4">
+                <h1 class="text-white text-lg font-semibold">Insurance CRM</h1>
+            </div>
+            <div class="px-2 py-4">
+                <ul class="space-y-2">
+                    <li class="{% if request.endpoint and 'dashboard' in request.endpoint %}bg-gray-900 text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %} rounded-md">
+                        <a href="{{ url_for('dashboard_bp.index') }}" class="block px-3 py-2">
+                            <i class="fas fa-home mr-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="{% if request.endpoint and 'clients' in request.endpoint %}bg-gray-900 text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %} rounded-md">
+                        <a href="{{ url_for('clients_bp.list') }}" class="block px-3 py-2">
+                            <i class="fas fa-users mr-2"></i> Clients
+                        </a>
+                    </li>
+                    <li class="{% if request.endpoint and 'policy.' in request.endpoint %}bg-gray-900 text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %} rounded-md">
+                        <a href="{{ url_for('policy_bp.list') }}" class="block px-3 py-2">
+                            <i class="fas fa-file-contract mr-2"></i> Policies
+                        </a>
+                    </li>
+                    <li class="{% if request.endpoint and 'assigned_policy' in request.endpoint %}bg-gray-900 text-white{% else %}text-gray-300 hover:bg-gray-700 hover:text-white{% endif %} rounded-md">
+                        <a href="{{ url_for('assigned_policy_bp.list') }}" class="block px-3 py-2">
+                            <i class="fas fa-clipboard-check mr-2"></i> Assigned Policies
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-16">
+                        <div class="flex"></div>
+                        <div class="flex items-center">
+                            <div class="relative" x-data="{ open: false }">
+                                <button id="user-menu-button" class="flex items-center text-gray-700 hover:text-gray-900">
+                                    <span class="mr-2">{{ current_user.name }}</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div id="user-menu-dropdown" class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                    <div class="py-1">
+                                        <a href="{{ url_for('auth_bp.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Profile
+                                        </a>
+                                        <a href="{{ url_for('auth_bp.logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Sign out
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 p-6">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="mb-4 p-4 rounded-md {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    {% else %}
+    <div class="min-h-screen bg-gray-100 flex items-center justify-center">
+        {% block auth_content %}{% endblock %}
+    </div>
+    {% endif %}
+
+    <!-- Alpine.js -->
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <!-- Custom JS -->
+    <script>
+        // User menu dropdown toggle
+        document.getElementById('user-menu-button')?.addEventListener('click', function() {
+            document.getElementById('user-menu-dropdown').classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('#user-menu-button')) {
+                document.getElementById('user-menu-dropdown')?.classList.add('hidden');
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

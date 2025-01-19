@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{% if client %}Edit{% else %}New{% endif %} Client{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                {% if client %}Edit{% else %}New{% endif %} Client
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                {% if client %}Update client information{% else %}Enter client details{% endif %}
+            </p>
+        </div>
+        <div class="border-t border-gray-200">
+            <form method="POST" class="space-y-6 p-6">
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <!-- Name -->
+                    <div class="sm:col-span-4">
+                        <label for="name" class="block text-sm font-medium text-gray-700">
+                            Full name
+                        </label>
+                        <div class="mt-1">
+                            <input type="text" name="name" id="name" 
+                                   value="{{ client.name if client else '' }}"
+                                   required
+                                   class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="sm:col-span-3">
+                        <label for="phone" class="block text-sm font-medium text-gray-700">
+                            Phone number
+                        </label>
+                        <div class="mt-1">
+                            <input type="tel" name="phone" id="phone" 
+                                   value="{{ client.phone if client else '' }}"
+                                   class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <!-- Age -->
+                    <div class="sm:col-span-2">
+                        <label for="age" class="block text-sm font-medium text-gray-700">
+                            Age
+                        </label>
+                        <div class="mt-1">
+                            <input type="number" name="age" id="age" 
+                                   value="{{ client.age if client else '' }}"
+                                   min="0" max="150"
+                                   class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <!-- Sex -->
+                    <div class="sm:col-span-2">
+                        <label for="sex" class="block text-sm font-medium text-gray-700">
+                            Sex
+                        </label>
+                        <div class="mt-1">
+                            <select id="sex" name="sex" 
+                                    class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                <option value="">Select...</option>
+                                <option value="Male" {% if client and client.sex == 'Male' %}selected{% endif %}>Male</option>
+                                <option value="Female" {% if client and client.sex == 'Female' %}selected{% endif %}>Female</option>
+                                <option value="Other" {% if client and client.sex == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="sm:col-span-6">
+                        <label for="address" class="block text-sm font-medium text-gray-700">
+                            Address
+                        </label>
+                        <div class="mt-1">
+                            <textarea id="address" name="address" rows="3"
+                                      class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">{{ client.address if client else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <a href="{{ url_for('clients_bp.list') }}"
+                       class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        {% if client %}Update{% else %}Create{% endif %} Client
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

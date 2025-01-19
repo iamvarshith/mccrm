@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Policy Documents{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Upload Policy Documents</h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">Upload PDF documents for policies</p>
+        </div>
+        <div class="border-t border-gray-200">
+            <form method="POST" enctype="multipart/form-data" class="space-y-6 p-6">
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <!-- Policy Selection -->
+                    <div class="sm:col-span-4">
+                        <label for="policy_id" class="block text-sm font-medium text-gray-700">Select Policy</label>
+                        <div class="mt-1">
+                            <select id="policy_id" name="policy_id" required
+                                    class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                <option value="">Choose a policy...</option>
+                                {% for policy in policies %}
+                                <option value="{{ policy.id }}">{{ policy.name }} ({{ policy.category }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="sm:col-span-6">
+                        <label for="document" class="block text-sm font-medium text-gray-700">Policy Document (PDF)</label>
+                        <div class="mt-1">
+                            <input type="file" name="document" id="document" accept=".pdf"
+                                   required
+                                   class="shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300">
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500">PDF files only. Maximum size: 10MB</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <a href="{{ url_for('policy_bp.list') }}"
+                       class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        Upload Document
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 
